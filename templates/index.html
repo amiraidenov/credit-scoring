@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кредитный скоринг</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="app-header">
+            <h1>Кредитный скоринг</h1>
+            <p>Оцените шансы на одобрение ипотечного кредита по вашим параметрам</p>
+        </header>
+
+        <!-- Mortgage calculator section -->
+        <div id="mortgage-calc" class="form-section">
+            <h2><i class="fas fa-calculator"></i> Калькулятор ипотеки</h2>
+            <div class="form-group slider-group full-width">
+                <label for="property_price">Стоимость недвижимости</label>
+                <input type="range" id="property_price" min="1000000" max="250000000" step="100000" value="20000000">
+                <div class="slider-value"><span id="property_price_display">20 000 000</span> ₸</div>
+            </div>
+            <div class="form-group slider-group full-width">
+                <label for="down_payment">Первоначальный взнос</label>
+                <input type="range" id="down_payment" min="0" max="50000000" step="100000" value="5000000">
+                <div class="slider-value"><span id="down_payment_display">5 000 000</span> ₸</div>
+            </div>
+            <div class="form-group full-width">
+                <label for="mortgage_years">Срок кредита (лет)</label>
+                <select id="mortgage_years">
+                    <option value="5">5 лет</option>
+                    <option value="10" selected>10 лет</option>
+                    <option value="15">15 лет</option>
+                    <option value="20">20 лет</option>
+                    <option value="25">25 лет</option>
+                    <option value="30">30 лет</option>
+                </select>
+            </div>
+            <div class="form-group slider-group full-width">
+                <label for="interest_rate">Процентная ставка (%)</label>
+                <input type="range" id="interest_rate" min="0" max="20" step="0.1" value="10">
+                <div class="slider-value"><span id="interest_rate_display">10.0</span>%</div>
+            </div>
+            <div class="form-group slider-group full-width">
+                <label for="monthly_income_calc">Ежемесячный доход</label>
+                <input type="range" id="monthly_income_calc" min="0" max="10000000" step="50000" value="1000000">
+                <div class="slider-value"><span id="monthly_income_calc_display">1 000 000</span> ₸</div>
+            </div>
+            <div class="form-actions">
+                <button type="button" id="calc_mortgage_btn" class="btn-submit">Рассчитать ипотеку</button>
+            </div>
+            <div id="mortgage_result" class="result-container hidden">
+                <p>Ежемесячный платеж: <strong><span id="monthly_payment_display"></span> ₸</strong></p>
+                <p>Переплата по кредиту: <strong><span id="overpayment_display"></span> ₸</strong></p>
+                <p>Доля платежа к доходу: <strong><span id="annuity_ratio_display"></span></strong></p>
+            </div>
+        </div>
+
+        <form id="credit-form">
+            <div class="form-section">
+                <h2><i class="fas fa-user"></i> Личное и социальное положение</h2>
+                
+                <div class="form-group">
+                    <label for="CODE_GENDER">Пол</label>
+                    <select id="CODE_GENDER" name="CODE_GENDER" required>
+                        <option value="M">Мужской</option>
+                        <option value="F">Женский</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="FLAG_OWN_REALTY">Есть ли недвижимость?</label>
+                    <select id="FLAG_OWN_REALTY" name="FLAG_OWN_REALTY" required>
+                        <option value="Y">Да</option>
+                        <option value="N">Нет</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="NAME_INCOME_TYPE">Тип занятости</label>
+                    <select id="NAME_INCOME_TYPE" name="NAME_INCOME_TYPE" required>
+                        <option value="Working">Работающий</option>
+                        <option value="State servant">Госслужащий</option>
+                        <option value="Commercial associate">Коммерческий партнер</option>
+                        <option value="Student">Студент</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="NAME_FAMILY_STATUS">Семейное положение</label>
+                    <select id="NAME_FAMILY_STATUS" name="NAME_FAMILY_STATUS" required>
+                        <option value="Married">В браке</option>
+                        <option value="Single / not married">Холост / не замужем</option>
+                        <option value="Civil marriage">Гражданский брак</option>
+                        <option value="Separated">В разводе</option>
+                        <option value="Widow">Вдовец / вдова</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2><i class="fas fa-graduation-cap"></i> Образование</h2>
+                
+                <div class="form-group full-width">
+                    <label for="NAME_EDUCATION_TYPE">Уровень образования</label>
+                    <select id="NAME_EDUCATION_TYPE" name="NAME_EDUCATION_TYPE" required>
+                        <option value="Secondary / secondary special">Среднее / среднее специальное</option>
+                        <option value="Higher education">Высшее образование</option>
+                        <option value="Incomplete higher">Неоконченное высшее</option>
+                        <option value="Lower secondary">Неполное среднее</option>
+                        <option value="Academic degree">Ученая степень</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2><i class="fas fa-briefcase"></i> Работа и кредитная история</h2>
+                
+                <div class="form-group">
+                    <label for="CREDIT_ACTIVE">Тип кредитной активности</label>
+                    <select id="CREDIT_ACTIVE" name="CREDIT_ACTIVE" required>
+                        <option value="Active">Активный</option>
+                        <option value="Closed">Закрытый</option>
+                        <option value="Sold">Проданный</option>
+                        <option value="Bad dept">Плохой долг</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="CREDIT_TYPE">Тип кредита</label>
+                    <select id="CREDIT_TYPE" name="CREDIT_TYPE" required>
+                        <option value="Mortgage">Ипотека</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ORG_TYPE_GROUPED">Тип организации</label>
+                    <select id="ORG_TYPE_GROUPED" name="ORG_TYPE_GROUPED" required>
+                        <option value="Частная компания">Частная компания</option>
+                        <option value="ИП / Самозанятый">ИП / Самозанятый</option>
+                        <option value="Торговая компания">Торговая компания</option>
+                        <option value="Производственная компания">Производственная компания</option>
+                        <option value="Медицинское учреждение">Медицинское учреждение</option>
+                        <option value="Государственная организация">Государственная организация</option>
+                        <option value="Транспортная компания">Транспортная компания</option>
+                        <option value="Госслужбы (полиция, армия и т.д.)">Госслужбы (полиция, армия и т.д.)</option>
+                        <option value="Школа">Школа</option>
+                        <option value="Детский сад">Детский сад</option>
+                        <option value="Строительство">Строительство</option>
+                        <option value="Банк">Банк</option>
+                        <option value="Охрана">Охрана</option>
+                        <option value="ЖКХ">ЖКХ</option>
+                        <option value="Почта">Почта</option>
+                        <option value="Сельское хозяйство">Сельское хозяйство</option>
+                        <option value="Ресторан / Кафе">Ресторан / Кафе</option>
+                        <option value="Сфера услуг">Сфера услуг</option>
+                        <option value="Университет / колледж">Университет / колледж</option>
+                        <option value="Энергетика">Энергетика</option>
+                        <option value="Телеком">Телеком</option>
+                        <option value="Гостиница">Гостиница</option>
+                        <option value="Страхование">Страхование</option>
+                        <option value="Маркетинг / Реклама">Маркетинг / Реклама</option>
+                        <option value="Искусство / Культура">Искусство / Культура</option>
+                        <option value="Риелтор">Риелтор</option>
+                        <option value="Юрист">Юрист</option>
+                        <option value="Уборка">Уборка</option>
+                        <option value="Религия">Религия</option>
+                        <option value="Другое">Другое</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="OCCUPATION_TYPE_RU">Профессия</label>
+                    <select id="OCCUPATION_TYPE_RU" name="OCCUPATION_TYPE_RU" required>
+                        <option value="Разнорабочие">Разнорабочие</option>
+                        <option value="Основной персонал">Основной персонал</option>
+                        <option value="Продавцы">Продавцы</option>
+                        <option value="Менеджеры">Менеджеры</option>
+                        <option value="Водители">Водители</option>
+                        <option value="Инженеры">Инженеры</option>
+                        <option value="Бухгалтеры">Бухгалтеры</option>
+                        <option value="Медработники">Медработники</option>
+                        <option value="Кухонный персонал">Кухонный персонал</option>
+                        <option value="Охрана">Охрана</option>
+                        <option value="Уборка">Уборка</option>
+                        <option value="Частный персонал">Частный персонал</option>
+                        <option value="Мало-квалифицированные рабочие">Мало-квалифицированные рабочие</option>
+                        <option value="Секретари">Секретари</option>
+                        <option value="Официанты/бармены">Официанты/бармены</option>
+                        <option value="Риелторы">Риелторы</option>
+                        <option value="HR">HR</option>
+                        <option value="IT">IT</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2><i class="fas fa-users"></i> Семья и доходы</h2>
+                
+                <div class="form-group">
+                    <label for="CNT_CHILDREN">Количество детей</label>
+                    <input type="number" id="CNT_CHILDREN" name="CNT_CHILDREN" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="CNT_FAM_MEMBERS">Размер семьи</label>
+                    <input type="number" id="CNT_FAM_MEMBERS" name="CNT_FAM_MEMBERS" min="1" required>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label>Продлевали ли вы кредит?</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="CNT_CREDIT_PROLONG" value="1"><span>Да</span></label>
+                        <label><input type="radio" name="CNT_CREDIT_PROLONG" value="0" checked><span>Нет</span></label>
+                    </div>
+                </div>
+                
+                <div class="form-group slider-group full-width">
+                    <label for="AMT_INCOME_TOTAL">Общий доход в месяц <small>(автоматически из калькулятора)</small></label>
+                    <input type="range" id="AMT_INCOME_TOTAL" name="AMT_INCOME_TOTAL" min="0" max="5000000" step="50000" value="1000000" readonly>
+                    <div class="slider-value"><span id="AMT_INCOME_TOTAL_display">1 000 000</span> ₸</div>
+                </div>
+                
+                <div class="form-group slider-group full-width hidden">
+                    <label for="AMT_CREDIT">Сумма кредита <small>(из калькулятора ипотеки)</small></label>
+                    <input type="hidden" id="AMT_CREDIT" name="AMT_CREDIT" value="3000000">
+                    <div class="slider-value hidden"><span id="AMT_CREDIT_display">3 000 000</span> ₸</div>
+                </div>
+                
+                <div class="form-group slider-group full-width">
+                    <label for="AMT_ANNUITY">Аннуитетный платеж <small>(автоматически из калькулятора)</small></label>
+                    <input type="range" id="AMT_ANNUITY" name="AMT_ANNUITY" min="0" max="200000" step="1000" value="50000" readonly>
+                    <div class="slider-value"><span id="AMT_ANNUITY_display">50 000</span> ₸</div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2><i class="fas fa-calendar-alt"></i> Временные признаки</h2>
+                
+                <div class="form-group">
+                    <label for="DAYS_BIRTH_years">Возраст (в годах)</label>
+                    <input type="number" id="DAYS_BIRTH_years" name="DAYS_BIRTH_years" min="18" max="100" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="DAYS_EMPLOYED_years">Стаж (в годах)</label>
+                    <input type="number" id="DAYS_EMPLOYED_years" name="DAYS_EMPLOYED_years" min="0" max="60" required>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2><i class="fas fa-map-marker-alt"></i> Дополнительные</h2>
+                
+                <div class="form-group">
+                    <label for="REGION_POPULATION_RELATIVE">Город</label>
+                    <select id="REGION_POPULATION_RELATIVE" name="REGION_POPULATION_RELATIVE" required>
+                        <option value="0.025">Алматы</option>
+                        <option value="0.020">Нур-Султан</option>
+                        <option value="0.018">Шымкент</option>
+                        <option value="0.010">Караганда</option>
+                        <option value="0.008">Актобе</option>
+                        <option value="0.005">Другое</option>
+                    </select>
+                </div>
+                
+                <div class="form-group hidden">
+                    <label for="LOAN_DURATION">Срок кредита (в месяцах)</label>
+                    <input type="hidden" id="LOAN_DURATION" name="LOAN_DURATION" value="240">
+                </div>
+                
+                <div class="form-group hidden">
+                    <label for="ANNUITY_INCOME_RATIO">Соотношение аннуитета к доходу</label>
+                    <input type="hidden" id="ANNUITY_INCOME_RATIO" name="ANNUITY_INCOME_RATIO" value="0.5">
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">Рассчитать шанс одобрения <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </form>
+        <div id="result" class="result-container hidden">
+            <h2>Результат скоринга</h2>
+            <div class="score-meter">
+                <div class="score-value"></div>
+                <div class="score-text">0%</div>
+            </div>
+
+            <div class="result-message"></div> <!-- не <p> -->
+            <button id="back-btn" class="btn-back"><i class="fas fa-arrow-left"></i> Назад к форме</button>
+        </div>
+
+    
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html> 
